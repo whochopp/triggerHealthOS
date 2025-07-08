@@ -1,46 +1,253 @@
-# Getting Started with Create React App
+# TriggerHealthOS
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modular, self-training frontend web app for mental health therapy business management. Built with React + TailwindCSS and optimized for iPad display.
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+TriggerHealthOS is designed for mental health therapy businesses to manage workflow through a trigger-based system. The app serves four main roles (Receptionist, Intern, Therapist, Admin) with role-specific dashboards and triggers that log to Airtable and initiate workflows via Zapier webhooks.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 🔐 Role-Based Access Control
+- **Receptionist**: Client management, form processing, appointments
+- **Intern**: Session logging, feedback requests, progress tracking
+- **Therapist**: Supervision, feedback provision, progress monitoring
+- **Admin**: System analytics, data export, comprehensive oversight
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 🧱 Core Functionality
+- **Trigger System**: 11 different triggers for workflow automation
+- **Airtable Integration**: All interactions logged to Airtable via API
+- **Zapier Webhooks**: Automated workflows triggered by button presses
+- **iPad Optimized**: Large buttons, responsive layout for tablet use
+- **HIPAA Compliant**: No PHI stored, only Client IDs used
 
-### `npm test`
+### 📊 Available Triggers
+- `/newclient` - Log new client
+- `/formreceived` - Mark intake form complete
+- `/assignclient` - Assign client to intern/therapist
+- `/noshow` - Log missed appointment
+- `/remindform` - Send form reminder
+- `/logsession` - Record session completion
+- `/needsfeedback` - Request therapist feedback
+- `/latefollowup` - Log delayed follow-up
+- `/sendfeedback` - Provide feedback to intern
+- `/checkprogress` - Review client progress
+- `/syncgpt` - Export data for AI analysis
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech Stack
 
-### `npm run build`
+- **Frontend**: React with TypeScript
+- **Styling**: TailwindCSS
+- **Backend**: Airtable (database)
+- **Automation**: Zapier (workflows)
+- **Optional**: GPT-4 API, Any.do API
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Setup Instructions
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Airtable account
+- Zapier account (for webhooks)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Installation
 
-### `npm run eject`
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd triggerhealthos
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` with your actual values:
+   - `REACT_APP_AIRTABLE_BASE_ID`: Your Airtable base ID
+   - `REACT_APP_AIRTABLE_API_KEY`: Your Airtable API key
+   - `REACT_APP_ZAPIER_*_WEBHOOK`: Individual webhook URLs for each trigger
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+4. **Set up Airtable**
+   Create tables in your Airtable base:
+   - `TriggerLogs`: Log all trigger interactions
+   - `Clients`: Store client information
+   - `Sessions`: Track therapy sessions
+   - `Users`: Store user information
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+5. **Configure Zapier Webhooks**
+   - Create webhook endpoints for each trigger
+   - Set up automations (e.g., Any.do reminders, email notifications)
+   - Add webhook URLs to your `.env` file
 
-## Learn More
+6. **Start the development server**
+   ```bash
+   npm start
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Usage
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Demo Login
+The app includes mock users for testing:
+
+- **Receptionist**: sarah@clinic.com / receptionist123
+- **Intern**: alex@clinic.com / intern123
+- **Therapist**: david@clinic.com / therapist123
+- **Admin**: admin@clinic.com / admin123
+
+Or use the quick role login feature on the login screen.
+
+### Role-Specific Workflows
+
+#### Receptionist Dashboard
+- Add new clients to system
+- Process intake forms
+- Assign clients to staff
+- Handle no-shows and reminders
+
+#### Intern Dashboard
+- Log completed sessions
+- Request feedback from supervisors
+- Track assigned clients
+- Monitor learning progress
+
+#### Therapist Dashboard
+- Provide feedback on intern sessions
+- Monitor client progress
+- Review supervision activities
+- Track intern development
+
+#### Admin Dashboard
+- View system-wide analytics
+- Export data for analysis
+- Monitor system health
+- Manage user performance
+
+## API Integration
+
+### Airtable Schema
+
+**TriggerLogs Table**
+- `trigger`: Text (trigger type)
+- `role`: Text (user role)
+- `client_id`: Text (client identifier)
+- `user_id`: Text (user identifier)
+- `timestamp`: DateTime
+- `success`: Checkbox
+- `additional_data`: Long text (JSON)
+- `error_message`: Text
+
+**Clients Table**
+- `client_id`: Text (primary key)
+- `intake_status`: Single select (pending, received, completed)
+- `assigned_intern`: Text
+- `assigned_therapist`: Text
+- `created_at`: DateTime
+- `updated_at`: DateTime
+
+### Webhook Payload Format
+
+```json
+{
+  "trigger": "/newclient",
+  "client_id": "CL-001",
+  "user_id": "user-rec-001",
+  "timestamp": "2025-01-08T14:32:00Z",
+  "additional_data": {
+    "intake_status": "pending"
+  }
+}
+```
+
+## Architecture
+
+### Component Structure
+```
+src/
+├── components/
+│   ├── auth/           # Authentication components
+│   ├── roles/          # Role-specific dashboards
+│   └── ui/             # Reusable UI components
+├── contexts/           # React contexts for state management
+├── services/           # API services (Airtable, Webhooks)
+├── types/              # TypeScript type definitions
+└── utils/              # Utility functions
+```
+
+### State Management
+- **AuthContext**: User authentication and role management
+- **TriggerContext**: Trigger execution and logging
+- **Local Storage**: Persistent login state
+
+### Security Considerations
+- No PHI (Protected Health Information) stored in frontend
+- Client IDs only (e.g., "CL-001") for identification
+- All sensitive data stored in SimplePractice or similar HIPAA-compliant system
+- Webhook signatures for API security
+
+## Deployment
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Environment Variables
+Ensure all production environment variables are set:
+- Airtable credentials
+- Zapier webhook URLs
+- Any optional API keys
+
+### Hosting Recommendations
+- **Vercel**: Easy deployment with environment variable support
+- **Netlify**: Simple hosting with form handling
+- **AWS S3 + CloudFront**: Scalable static hosting
+
+## Development
+
+### Adding New Triggers
+1. Add trigger type to `types/index.ts`
+2. Update `TriggerContext` with handler logic
+3. Add webhook configuration to `services/webhook.ts`
+4. Create trigger button in relevant dashboard
+
+### Customizing Roles
+1. Update `Role` type in `types/index.ts`
+2. Add new dashboard component
+3. Update `AuthContext` and `App.tsx` routing
+4. Configure role-specific permissions
+
+## Testing
+
+### Mock Data
+The app includes mock users and data for testing:
+- Mock clients (CL-001, CL-007, CL-012)
+- Sample trigger logs
+- Test user accounts
+
+### Testing Triggers
+1. Login with test account
+2. Use trigger buttons with test Client IDs
+3. Verify logs in Airtable
+4. Check webhook deliveries in Zapier
+
+## Support
+
+For issues or questions:
+1. Check the console for error messages
+2. Verify Airtable API connectivity
+3. Test webhook endpoints in Zapier
+4. Review environment variable configuration
+
+## License
+
+[Add your license information here]
+
+## Contributing
+
+[Add contribution guidelines here]
